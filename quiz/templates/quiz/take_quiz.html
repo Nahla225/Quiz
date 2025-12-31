@@ -1,0 +1,56 @@
+{% extends 'quiz/base.html' %}
+
+{% block title %}Take Quiz: {{ quiz.title }} - Online Quiz System{% endblock %}
+
+{% block content %}
+<h1>{{ quiz.title }}</h1>
+<div class="timer" id="timer">Time Remaining: <span id="time-display"></span></div>
+
+<form method="post" id="quiz-form">
+    {% csrf_token %}
+    
+    {% for item in question_data %}
+        <div class="question">
+            <h3>Question {{ forloop.counter }}: {{ item.question.text }}</h3>
+            {% for choice in item.choices %}
+                <div class="choice">
+                    <label>
+                        <input type="radio" 
+                               name="question_{{ item.question.id }}" 
+                               value="{{ choice.id }}"
+                               {% if item.user_answer and item.user_answer.selected_choice.id == choice.id %}checked{% endif %}
+                               required>
+                        {{ choice.text }}
+                    </label>
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+    
+    <button type="submit" class="btn btn-success" style="width: 100%; font-size: 18px; padding: 15px;">
+        Submit Quiz
+    </button>
+</form>
+
+<script>
+    let remainingSeconds = {{ remaining_seconds }};
+    
+    function updateTimer() {
+        const minutes = Math.floor(remainingSeconds / 60);
+        const seconds = remainingSeconds % 60;
+        document.getElementById('time-display').textContent = 
+            `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (remainingSeconds <= 0) {
+            document.getElementById('quiz-form').submit();
+            return;
+        }
+        
+        remainingSeconds--;
+        setTimeout(updateTimer, 1000);
+    }
+    
+    updateTimer();
+</script>
+{% endblock %}
+

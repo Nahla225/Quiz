@@ -1,0 +1,41 @@
+{% extends 'quiz/base.html' %}
+
+{% block title %}Quiz Result - Online Quiz System{% endblock %}
+
+{% block content %}
+<h1>Quiz Results: {{ attempt.quiz.title }}</h1>
+
+<div class="score">
+    Your Score: {{ attempt.score }} / {{ attempt.total_questions }} 
+    ({{ attempt.get_percentage }}%)
+</div>
+
+<h2>Question Review:</h2>
+
+{% for item in answer_data %}
+    <div class="result-card">
+        <h3>Question: {{ item.question.text }}</h3>
+        <p><strong>Your Answer:</strong> 
+            {% if item.user_choice %}
+                {{ item.user_choice.text }}
+                {% if item.is_correct %}
+                    <span class="correct">✓ Correct</span>
+                {% else %}
+                    <span class="incorrect">✗ Incorrect</span>
+                {% endif %}
+            {% else %}
+                <span class="incorrect">No answer provided</span>
+            {% endif %}
+        </p>
+        {% if not item.is_correct %}
+            <p><strong>Correct Answer:</strong> {{ item.correct_choice.text }}</p>
+        {% endif %}
+    </div>
+{% endfor %}
+
+<div style="text-align: center; margin-top: 30px;">
+    <a href="{% url 'quiz_list' %}" class="btn">Take Another Quiz</a>
+    <a href="{% url 'profile' %}" class="btn" style="background: #28a745;">View Profile</a>
+</div>
+{% endblock %}
+

@@ -1,0 +1,64 @@
+{% extends 'quiz/base.html' %}
+
+{% block title %}Add Questions - {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<h1>Manage Questions: {{ quiz.title }}</h1>
+<div style="margin-bottom: 20px;">
+    <a href="{% url 'admin_quiz_list' %}" class="btn">Back to Quiz List</a>
+</div>
+
+<div style="background: #e7f3ff; padding: 20px; border-radius: 5px; margin-bottom: 30px;">
+    <h2>Add New Question</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="question_text">Question Text *</label>
+            <textarea id="question_text" name="question_text" rows="3" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="order">Order (optional)</label>
+            <input type="number" id="order" name="order" value="0" min="0">
+        </div>
+        <h3 style="margin-top: 20px;">Choices (mark one as correct)</h3>
+        {% for i in "1234" %}
+            <div class="form-group">
+                <label>
+                    <input type="radio" name="correct_choice" value="{{ i }}" required> Choice {{ i }} *
+                    <input type="text" name="choice_{{ i }}" style="width: 70%; margin-left: 10px;" required>
+                </label>
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-success">Add Question</button>
+    </form>
+</div>
+
+<h2>Existing Questions ({{ questions.count }})</h2>
+{% if questions %}
+    {% for question in questions %}
+        <div class="quiz-card">
+            <h3>Question {{ question.order }}: {{ question.text }}</h3>
+            <p><strong>Choices:</strong></p>
+            <ul>
+                {% for choice in question.choices.all %}
+                    <li>
+                        {{ choice.text }}
+                        {% if choice.is_correct %}
+                            <span class="correct">✓ Correct</span>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+            <div style="margin-top: 10px;">
+                <a href="{% url 'admin_edit_question' question.id %}" class="btn" style="padding: 5px 10px; font-size: 14px; background: #ffc107; margin-right: 5px;">Edit</a>
+                <a href="{% url 'admin_delete_question' question.id %}" class="btn btn-danger" style="padding: 5px 10px; font-size: 14px;">Delete</a>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <p style="text-align: center; color: #666; padding: 20px;">
+        No questions added yet. Add your first question above.
+    </p>
+{% endif %}
+{% endblock %}
+

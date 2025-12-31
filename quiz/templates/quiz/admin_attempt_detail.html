@@ -1,0 +1,84 @@
+{% extends 'quiz/base.html' %}
+
+{% block title %}Attempt Details - {{ attempt.user.username }}{% endblock %}
+
+{% block content %}
+<h1>Quiz Attempt Details</h1>
+<div style="margin-bottom: 20px;">
+    <a href="{% url 'admin_quiz_submissions' attempt.quiz.id %}" class="btn">Back to Submissions</a>
+</div>
+
+<div style="background: #f0f0f0; padding: 20px; border-radius: 5px; margin-bottom: 30px;">
+    <h2>Student Information</h2>
+    <p><strong>Student Name:</strong> {{ attempt.user.username }}</p>
+    <p><strong>Email:</strong> {{ attempt.user.email }}</p>
+    <p><strong>Quiz:</strong> {{ attempt.quiz.title }}</p>
+    <p><strong>Started At:</strong> {{ attempt.started_at|date:"M d, Y H:i:s" }}</p>
+    <p><strong>Completed At:</strong> {{ attempt.completed_at|date:"M d, Y H:i:s" }}</p>
+    {% if time_taken_seconds %}
+        <p><strong>Time Taken:</strong> 
+            {{ time_taken_seconds }} seconds
+            {% if time_taken_minutes %}
+                ({{ time_taken_minutes }} minutes)
+            {% endif %}
+        </p>
+    {% endif %}
+</div>
+
+<div class="score" style="margin-bottom: 30px;">
+    Score: {{ attempt.score }} / {{ attempt.total_questions }} 
+    ({{ attempt.get_percentage }}%)
+    {% if attempt.get_percentage >= 70 %}
+        <span style="color: #28a745;">✓ Pass</span>
+    {% elif attempt.get_percentage >= 50 %}
+        <span style="color: #ffc107;">⚠ Average</span>
+    {% else %}
+        <span style="color: #dc3545;">✗ Fail</span>
+    {% endif %}
+</div>
+
+<h2>Question Review</h2>
+{% for item in answer_data %}
+    <div class="result-card" style="margin-bottom: 20px;">
+        <h3>Question {{ forloop.counter }}: {{ item.question.text }}</h3>
+        <p><strong>Student's Answer:</strong> 
+            {% if item.user_choice %}
+                {{ item.user_choice.text }}
+                {% if item.is_correct %}
+                    <span class="correct">✓ Correct</span>
+                {% else %}
+                    <span class="incorrect">✗ Incorrect</span>
+                {% endif %}
+            {% else %}
+                <span class="incorrect">No answer provided</span>
+            {% endif %}
+        </p>
+        {% if item.correct_choice %}
+            <p><strong>Correct Answer:</strong> 
+                <span style="color: #28a745; font-weight: bold;">{{ item.correct_choice.text }}</span>
+            </p>
+        {% endif %}
+        <div style="margin-top: 10px;">
+            <strong>All Choices:</strong>
+            <ul style="margin-top: 5px;">
+                {% for choice in item.question.choices.all %}
+                    <li>
+                        {{ choice.text }}
+                        {% if choice.is_correct %}
+                            <span style="color: #28a745;">(Correct)</span>
+                        {% endif %}
+                        {% if item.user_choice and item.user_choice.id == choice.id %}
+                            <span style="color: #667eea; font-weight: bold;">← Selected</span>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endfor %}
+
+<div style="text-align: center; margin-top: 30px;">
+    <a href="{% url 'admin_quiz_submissions' attempt.quiz.id %}" class="btn">Back to Submissions</a>
+</div>
+{% endblock %}
+

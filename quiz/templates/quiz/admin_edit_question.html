@@ -1,0 +1,32 @@
+{% extends 'quiz/base.html' %}
+
+{% block title %}Edit Question - Admin{% endblock %}
+
+{% block content %}
+<h1>Edit Question</h1>
+<p><strong>Quiz:</strong> {{ question.quiz.title }}</p>
+<form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="question_text">Question Text *</label>
+        <textarea id="question_text" name="question_text" rows="3" required>{{ question.text }}</textarea>
+    </div>
+    <div class="form-group">
+        <label for="order">Order</label>
+        <input type="number" id="order" name="order" value="{{ question.order }}" min="0">
+    </div>
+    <h3>Choices (mark one as correct)</h3>
+    {% for choice in choices %}
+        <div class="form-group">
+            <label>
+                <input type="radio" name="correct_choice" value="{{ forloop.counter }}" {% if choice.is_correct %}checked{% endif %} required> 
+                Choice {{ forloop.counter }} *
+                <input type="text" name="choice_{{ forloop.counter }}" value="{{ choice.text }}" style="width: 70%; margin-left: 10px;" required>
+            </label>
+        </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-success">Update Question</button>
+    <a href="{% url 'admin_add_questions' question.quiz.id %}" class="btn">Cancel</a>
+</form>
+{% endblock %}
+

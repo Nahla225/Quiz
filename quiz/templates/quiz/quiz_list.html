@@ -1,0 +1,24 @@
+{% extends 'quiz/base.html' %}
+
+{% block title %}Available Quizzes - Online Quiz System{% endblock %}
+
+{% block content %}
+<h1>Available Quizzes</h1>
+
+{% if quizzes %}
+    {% for quiz in quizzes %}
+        <div class="quiz-card">
+            <h3>{{ quiz.title }}</h3>
+            <p>{{ quiz.description }}</p>
+            <p><strong>Duration:</strong> {{ quiz.duration }} minutes</p>
+            <p><strong>Questions:</strong> {{ quiz.questions.count }}</p>
+            <a href="{% url 'take_quiz' quiz.id %}" class="btn">Start Quiz</a>
+        </div>
+    {% endfor %}
+{% else %}
+    <p style="text-align: center; color: #666; padding: 40px;">
+        No quizzes available at the moment. Please check back later.
+    </p>
+{% endif %}
+{% endblock %}
+

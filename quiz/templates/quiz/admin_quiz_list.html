@@ -1,0 +1,54 @@
+{% extends 'quiz/base.html' %}
+
+{% block title %}Admin - Quiz Management{% endblock %}
+
+{% block content %}
+<h1>Quiz Management</h1>
+<div style="margin-bottom: 20px;">
+    <a href="{% url 'admin_create_quiz' %}" class="btn btn-success">Create New Quiz</a>
+    <a href="{% url 'quiz_list' %}" class="btn">View Student Quizzes</a>
+</div>
+
+{% if quizzes %}
+    <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+        <thead>
+            <tr style="background: #667eea; color: white;">
+                <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Title</th>
+                <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Duration</th>
+                <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Questions</th>
+                <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Status</th>
+                <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Created</th>
+                <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for quiz in quizzes %}
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 12px; border: 1px solid #ddd;">{{ quiz.title }}</td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">{{ quiz.duration }} min</td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">{{ quiz.questions.count }}</td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">
+                        {% if quiz.is_active %}
+                            <span style="color: #28a745; font-weight: bold;">Active</span>
+                        {% else %}
+                            <span style="color: #dc3545; font-weight: bold;">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">{{ quiz.created_at|date:"M d, Y" }}</td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">
+                        <a href="{% url 'admin_add_questions' quiz.id %}" class="btn" style="padding: 5px 10px; font-size: 14px; margin-right: 5px;">Questions</a>
+                        <a href="{% url 'admin_quiz_submissions' quiz.id %}" class="btn" style="padding: 5px 10px; font-size: 14px; background: #17a2b8; color: white; margin-right: 5px;">Submissions</a>
+                        <a href="{% url 'admin_edit_quiz' quiz.id %}" class="btn" style="padding: 5px 10px; font-size: 14px; background: #ffc107; margin-right: 5px;">Edit</a>
+                        <a href="{% url 'admin_delete_quiz' quiz.id %}" class="btn btn-danger" style="padding: 5px 10px; font-size: 14px;">Delete</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p style="text-align: center; color: #666; padding: 40px;">
+        No quizzes created yet. <a href="{% url 'admin_create_quiz' %}">Create your first quiz!</a>
+    </p>
+{% endif %}
+{% endblock %}
+

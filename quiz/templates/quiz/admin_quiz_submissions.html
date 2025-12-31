@@ -1,0 +1,86 @@
+{% extends 'quiz/base.html' %}
+
+{% block title %}Quiz Submissions - {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<h1>Quiz Submissions: {{ quiz.title }}</h1>
+<div style="margin-bottom: 20px;">
+    <a href="{% url 'admin_quiz_list' %}" class="btn">Back to Quiz List</a>
+    <a href="{% url 'admin_add_questions' quiz.id %}" class="btn" style="background: #28a745;">Manage Questions</a>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px;">
+    <div style="background: #e7f3ff; padding: 20px; border-radius: 5px; text-align: center;">
+        <h3 style="color: #667eea; margin-bottom: 10px;">Total Submissions</h3>
+        <p style="font-size: 32px; font-weight: bold; color: #333;">{{ total_attempts }}</p>
+    </div>
+    <div style="background: #d4edda; padding: 20px; border-radius: 5px; text-align: center;">
+        <h3 style="color: #28a745; margin-bottom: 10px;">Average Score</h3>
+        <p style="font-size: 32px; font-weight: bold; color: #333;">{{ avg_score }}/{{ quiz.questions.count }}</p>
+        <p style="color: #666;">({{ avg_percentage }}%)</p>
+    </div>
+    <div style="background: #fff3cd; padding: 20px; border-radius: 5px; text-align: center;">
+        <h3 style="color: #ffc107; margin-bottom: 10px;">Highest Score</h3>
+        <p style="font-size: 32px; font-weight: bold; color: #333;">{{ highest_score }}/{{ quiz.questions.count }}</p>
+    </div>
+    <div style="background: #f8d7da; padding: 20px; border-radius: 5px; text-align: center;">
+        <h3 style="color: #dc3545; margin-bottom: 10px;">Lowest Score</h3>
+        <p style="font-size: 32px; font-weight: bold; color: #333;">{{ lowest_score }}/{{ quiz.questions.count }}</p>
+    </div>
+</div>
+
+<h2>Student Submissions ({{ total_attempts }})</h2>
+{% if attempt_data %}
+    <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+        <thead>
+            <tr style="background: #667eea; color: white;">
+                <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Student</th>
+                <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Email</th>
+                <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Score</th>
+                <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Percentage</th>
+                <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Started At</th>
+                <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Completed At</th>
+                <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Time Taken</th>
+                <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in attempt_data %}
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 12px; border: 1px solid #ddd;">{{ item.attempt.user.username }}</td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">{{ item.attempt.user.email }}</td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">
+                        <strong>{{ item.attempt.score }}/{{ item.attempt.total_questions }}</strong>
+                    </td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">
+                        {% if item.attempt.get_percentage >= 70 %}
+                            <span style="color: #28a745; font-weight: bold;">{{ item.attempt.get_percentage }}%</span>
+                        {% elif item.attempt.get_percentage >= 50 %}
+                            <span style="color: #ffc107; font-weight: bold;">{{ item.attempt.get_percentage }}%</span>
+                        {% else %}
+                            <span style="color: #dc3545; font-weight: bold;">{{ item.attempt.get_percentage }}%</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">{{ item.attempt.started_at|date:"M d, Y H:i" }}</td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">{{ item.attempt.completed_at|date:"M d, Y H:i" }}</td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">
+                        {% if item.time_taken %}
+                            {{ item.time_taken }} seconds
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">
+                        <a href="{% url 'admin_attempt_detail' item.attempt.id %}" class="btn" style="padding: 5px 10px; font-size: 14px;">View Details</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p style="text-align: center; color: #666; padding: 40px;">
+        No submissions yet for this quiz.
+    </p>
+{% endif %}
+{% endblock %}
+
